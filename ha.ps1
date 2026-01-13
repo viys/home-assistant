@@ -40,8 +40,9 @@ function Stop-HA {
 }
 
 function Restart-HA {
-    Stop-HA
-    Start-HA
+    Go-ProjectDir
+    Write-Host "==> 重启 Home Assistant..." -ForegroundColor Yellow
+    docker compose restart homeassistant
 }
 
 function Show-Logs {

@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "minor_version": 1,
+  "key": "person",
+  "data": {
+    "items": [
+      {
+        "id": "jiyonyu",
+        "name": "JiyonYu",
+        "user_id": "ec18264994fe45e383833ac779ab9de2",
+        "device_trackers": []
+      }
+    ]
+  }
+}
