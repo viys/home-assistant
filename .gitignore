@@ -1,0 +1,3 @@
+config/home-assistant.log
+config/home-assistant.log.*
+config/home-assistant.log.fault

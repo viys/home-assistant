@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("start", "stop", "restart", "logs", "open", "status")]
+    [ValidateSet("start", "stop", "restart", "logs", "shell", "open", "status")]
     [string]$Action = "help"
 )
 

@@ -9,19 +9,3 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       - ./config:/config
-
-  # code-server:
-  #   container_name: code-server
-  #   image: lscr.io/linuxserver/code-server:latest
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8443:8443"
-  #   environment:
-  #     - TZ=Asia/Shanghai
-  #     - PASSWORD=${CODE_SERVER_PASSWORD}
-  #     # Windows 下权限映射有时会引发麻烦；如你保存文件失败，再考虑加这两行或删掉它们
-  #     # - PUID=1000
-  #     # - PGID=1000
-  #   volumes:
-  #     - ./code-server:/config
-  #     - ./config:/workspace/homeassistant-config
