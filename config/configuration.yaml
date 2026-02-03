@@ -5,9 +5,13 @@ default_config:
 # Load frontend themes from the themes folder
 frontend:
   themes: !include_dir_merge_named themes
-zha:
-  custom_quirks_path: zha_quirks
 
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+zha:
+  database_path: /config/zigbee.db
+  enable_quirks: true
+  custom_quirks_path: /config/zha_quirks
+
