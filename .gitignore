@@ -49,7 +49,7 @@ config/ip_bans.yaml
 *~
 
 # 文档目录
-docs/
+# docs/
 
 # Claude Code 配置
 .claude/
