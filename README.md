@@ -1,6 +1,6 @@
 # Home Assistant Docker 部署
 
-基于 Docker 的 Home Assistant 部署方案，支持 Zigbee 设备接入（ZHA 集成），适用于 Windows + WSL2 环境。
+基于 Docker 的 Home Assistant 部署方案，支持 Zigbee 设备接入（ZHA 集成），适用于 Windows + WSL2 和 Ubuntu 环境。
 
 ## 项目结构
 
