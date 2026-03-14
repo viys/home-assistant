@@ -22,10 +22,10 @@ zha:
   custom_quirks_path: /config/zha_quirks
 
 # 调试日志配置（用于测试 OTA）
-logger:
-  default: info
-  logs:
-    zigpy.ota: debug                        # OTA 核心日志
-    zigpy.ota.provider: debug               # OTA 提供商日志
-    homeassistant.components.zha: debug     # ZHA 集成日志
-    bellows.zigbee.application: debug       # Zigbee 应用层日志（如果用 EZSP）
+# logger:
+#   default: info
+#   logs:
+#     zigpy.ota: debug                        # OTA 核心日志
+#     zigpy.ota.provider: debug               # OTA 提供商日志
+#     homeassistant.components.zha: debug     # ZHA 集成日志
+#     bellows.zigbee.application: debug       # Zigbee 应用层日志（如果用 EZSP）
