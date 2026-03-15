@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("start", "stop", "restart", "logs", "shell", "open", "status")]
+    [ValidateSet("start", "stop", "restart", "logs", "shell", "open", "status", "help")]
     [string]$Action = "help"
 )
 
@@ -72,5 +72,6 @@ switch ($Action) {
     "shell"   { Enter-Shell }
     "open"    { Open-Web }
     "status"  { Show-Status }
+    "help"    { Show-Help }
     default   { Show-Help }
 }
