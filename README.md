@@ -7,6 +7,7 @@
 ```text
 home-assistant/
 ├── docker-compose.yml       # Docker 服务配置
+├── install_docker.sh        # Docker 一键安装脚本（Ubuntu/WSL2）
 ├── ha.sh                    # Linux/WSL 管理脚本
 ├── ha.ps1                   # Windows PowerShell 管理脚本
 ├── config/                  # Home Assistant 配置目录（挂载到容器）
@@ -36,7 +37,32 @@ git clone <repo-url>
 cd home-assistant
 ```
 
-### 2. 连接 USB Zigbee 设备（Windows 用户）
+### 2. 安装 Docker
+
+**Ubuntu / WSL2：**
+
+如果尚未安装 Docker，可使用项目内置脚本一键完成安装：
+
+```bash
+chmod +x install_docker.sh
+./install_docker.sh
+```
+
+脚本会自动完成以下操作：
+
+- 检测是否已安装 Docker，若已安装则直接确认服务状态并退出
+- 移除旧版本的 Docker 残留包
+- 添加 Docker 官方 APT 仓库并安装最新稳定版
+- 启用并启动 `docker` 服务
+- 将当前用户加入 `docker` 用户组（免 `sudo` 使用 Docker）
+
+> **注意：** 安装完成后需重新登录（或重启终端）使用户组变更生效，之后才能不加 `sudo` 直接运行 `docker` 命令。
+
+**Windows：**
+
+安装 [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)，安装时勾选 **Use WSL 2 based engine**。安装完成后启动 Docker Desktop，确认任务栏图标显示为运行中状态即可。
+
+### 3. 连接 USB Zigbee 设备（Windows 用户）
 
 将 Zigbee USB Dongle 插入电脑，通过 USBIPD 共享给 WSL2：
 
@@ -53,7 +79,7 @@ usbipd attach --wsl --busid <设备ID>
 
 详细说明见 [USBIPD使用指南](docs/USBIPD使用指南.md)。
 
-### 3. 启动服务
+### 4. 启动服务
 
 **Linux / WSL2：**
 
@@ -67,7 +93,7 @@ usbipd attach --wsl --busid <设备ID>
 .\ha.ps1 start
 ```
 
-### 4. 访问 Web 界面
+### 5. 访问 Web 界面
 
 打开浏览器访问：<http://localhost:8123>
 
@@ -111,7 +137,7 @@ zha:
 
 ## 常用设备
 
-- Zigbee USB Dongle（如 SONOFF Zigbee 3.0 USB Dongle Plus、ConBee II）
+- Zigbee USB Dongle（如 Zigbee 3.0 USB Dongle Plus、ConBee II）
   - 设备路径：`/dev/ttyUSB0`
 
 ## 镜像版本说明
