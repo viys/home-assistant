@@ -2,6 +2,8 @@
 
 基于 Docker 的 Home Assistant 部署方案，支持 Zigbee 设备接入（ZHA 集成），适用于 Windows + WSL2 和 Ubuntu 环境。
 
+**按照本教程完成部署后，你将得到：** 一套可快速拉起的本地 Home Assistant 开发环境，专为 ZHA 脚本的开发与调试设计——无需真实主机安装，容器随起随停，配合 Zigbee USB Dongle 即可在本地复现完整的 ZHA 运行环境，方便编写、测试和验证自动化脚本。
+
 ## 项目结构
 
 ```text
