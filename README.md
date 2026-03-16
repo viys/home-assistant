@@ -37,6 +37,8 @@ git clone <repo-url>
 cd home-assistant
 ```
 
+**克隆结果：** 本地会生成 `home-assistant/` 目录，包含所有配置文件和管理脚本，可直接进入下一步。
+
 ### 2. 安装 Docker
 
 **Ubuntu / WSL2：**
@@ -48,19 +50,29 @@ chmod +x install_docker.sh
 ./install_docker.sh
 ```
 
-脚本会自动完成以下操作：
+**安装结果：** 脚本执行完成后，你将得到一个可直接使用的 Docker 环境：
 
-- 检测是否已安装 Docker，若已安装则直接确认服务状态并退出
-- 移除旧版本的 Docker 残留包
-- 添加 Docker 官方 APT 仓库并安装最新稳定版
-- 启用并启动 `docker` 服务
-- 将当前用户加入 `docker` 用户组（免 `sudo` 使用 Docker）
+- `docker` 和 `docker compose` 命令均可用
+- Docker 服务已设为开机自启，无需每次手动启动
+- 当前用户已加入 `docker` 用户组，可不加 `sudo` 直接运行所有 Docker 命令
+
+验证安装是否成功：
+
+```bash
+docker --version        # 应输出类似 Docker version 27.x.x
+docker compose version  # 应输出类似 Docker Compose version v2.x.x
+docker run hello-world  # 拉取并运行测试镜像，输出 "Hello from Docker!" 即代表一切正常
+```
+
+脚本执行过程中会自动完成：移除旧版本残留、添加 Docker 官方 APT 仓库、安装 `docker-ce`、`docker-compose-plugin` 等组件。若检测到 Docker 已安装，则跳过安装直接确认服务状态后退出，不会重复操作。
 
 > **注意：** 安装完成后需重新登录（或重启终端）使用户组变更生效，之后才能不加 `sudo` 直接运行 `docker` 命令。
 
 **Windows：**
 
 安装 [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)，安装时勾选 **Use WSL 2 based engine**。安装完成后启动 Docker Desktop，确认任务栏图标显示为运行中状态即可。
+
+**安装结果：** Docker Desktop 运行后，WSL2 内的 `docker` 和 `docker compose` 命令即可直接使用，无需额外配置。
 
 ### 3. 连接 USB Zigbee 设备（Windows 用户）
 
@@ -75,6 +87,12 @@ usbipd bind --busid <设备ID>
 
 # 附加设备到 WSL2（每次重启后需要）
 usbipd attach --wsl --busid <设备ID>
+```
+
+**连接结果：** 完成后在 WSL2 中运行以下命令，应能看到 `/dev/ttyUSB0`（或类似设备节点）出现，表示 Zigbee Dongle 已成功映射到 Linux 环境：
+
+```bash
+ls /dev/ttyUSB*
 ```
 
 详细说明见 [USBIPD使用指南](docs/USBIPD使用指南.md)。
@@ -93,9 +111,18 @@ usbipd attach --wsl --busid <设备ID>
 .\ha.ps1 start
 ```
 
+**启动结果：** Home Assistant 容器在后台运行，首次启动会拉取镜像，耗时约 1~3 分钟。验证服务是否就绪：
+
+```bash
+./ha.sh status   # 容器状态应显示 Up
+./ha.sh logs     # 观察日志，出现 "Home Assistant initialized" 表示启动完成
+```
+
 ### 5. 访问 Web 界面
 
 打开浏览器访问：<http://localhost:8123>
+
+**访问结果：** 看到 Home Assistant 初始化向导页面，按提示创建管理员账号即可完成首次配置。若页面无法打开，说明容器尚未完全启动，稍等片刻后刷新重试。
 
 ## 管理脚本
 
