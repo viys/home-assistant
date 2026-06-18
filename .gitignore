@@ -16,6 +16,10 @@ __pycache__/
 
 # Home Assistant 内部存储（设备、实体、认证等运行时状态）
 config/.storage/
+config/.cache/
+
+# Home Assistant 官方默认蓝图
+config/blueprints/*/homeassistant/
 
 # 运行时文件
 config/.HA_VERSION
@@ -51,5 +55,8 @@ config/ip_bans.yaml
 # 文档目录
 # docs/
 
-# Claude Code 配置
+# AI 配置
 .claude/
+.codex/
+
+openspec/

@@ -30,14 +30,7 @@ function Go-ProjectDir {
 function Start-HA {
     Go-ProjectDir
     Write-Host "==> 启动 Home Assistant..." -ForegroundColor Green
-    $CommandOutput = docker compose up -d 2>&1
-    $CommandOutput | ForEach-Object { $_ }
-
-    if ($LASTEXITCODE -ne 0 -and ($CommandOutput -join [Environment]::NewLine) -match 'error gathering device information while adding custom device "/dev/ttyUSB0": no such file or directory') {
-        Write-Host ""
-        Write-Host "检测到 WSL 侧的串口设备 /dev/ttyUSB0 不存在，请先启动 WSL 后再重试。" -ForegroundColor Yellow
-        Write-Host "可先执行 `wsl` 进入 WSL，确认设备已挂载后，再执行 .\ha.ps1 start" -ForegroundColor Yellow
-    }
+    docker compose up -d
 }
 
 function Stop-HA {

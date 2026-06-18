@@ -147,6 +147,27 @@ ls /dev/ttyUSB*
 ./ha.sh shell    # 进入容器
 ```
 
+## 最小配置说明
+
+当前仓库按 `Home Assistant` 的最小 YAML 工程整理，`configuration.yaml` 只保留默认入口和项目实际使用的 `ZHA` 配置：
+
+```yaml
+default_config:
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+zha:
+  database_path: /config/zigbee.db
+  enable_quirks: true
+  custom_quirks_path: /config/zha_quirks
+```
+
+- `automations.yaml`、`scripts.yaml`、`scenes.yaml` 是 Home Assistant UI 写入的默认文件入口，官方建议保留
+- `zha` 是本项目唯一保留的手写功能配置，因为你当前工程确实依赖 Zigbee 数据库和自定义 quirks
+- 本仓库默认不启用本地 OTA 源，需要时再临时打开 `zha.zigpy_config.ota`
+
 ## Zigbee 配置（ZHA）
 
 本项目使用 ZHA（Zigbee Home Automation）集成管理 Zigbee 设备。
@@ -202,7 +223,7 @@ Invalid config for 'zha': not a directory for dictionary value 'zha->custom_quir
 | `latest` | 同 `stable` | 同上 |
 | `beta` | 公测版，功能较新但可能有 bug | 想尝鲜但求稳 |
 | `dev` | 开发/每日构建版，最新特性 | 开发测试，不稳定 |
-| `2025.2.0` | 指定具体版本号 | 锁定版本，防止意外升级 |
+| `2026.6.3` | 指定当前已验证版本号 | 锁定版本 |
 
 修改 `docker-compose.yml` 中的 `image` 字段即可切换版本：
 

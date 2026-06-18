@@ -81,24 +81,25 @@ ZHA 支持两种本地 OTA 固件配置方式：
 code config/configuration.yaml
 ```
 
-找到 `zha:` 部分，**完全替换**为以下配置：
+在现有 `zha:` 配置下补充 `zigpy_config.ota`：
 
 ```yaml
 zha:
   database_path: /config/zigbee.db
+  enable_quirks: true
+  custom_quirks_path: /config/zha_quirks
   zigpy_config:
     ota:
       extra_providers:
         - type: z2m_local
           index_file: /config/zigpy_ota/index.json
-  enable_quirks: true
-  custom_quirks_path: /config/zha_quirks
 ```
 
 **⚠️ 重要说明：**
 - 路径必须使用 Docker 容器内的路径（`/config/...`），不是 Windows 路径
 - `extra_providers` 表示在默认 OTA 源基础上添加本地源
 - 如果只想使用本地固件，将 `extra_providers` 改为 `providers`
+- `z2m_local` 读取的是本地 `index.json`，字段风格与 Zigbee2MQTT OTA 索引一致
 
 ### 步骤 2：准备目录结构
 
@@ -336,8 +337,8 @@ ls -lh config/zigpy_ota/
 配置完成后，重启 Home Assistant 以加载新配置：
 
 ```bash
-# 方法 1：使用 docker-compose
-docker-compose restart homeassistant
+# 方法 1：使用 docker compose
+docker compose restart homeassistant
 
 # 方法 2：使用项目提供的脚本（如果有）
 .\ha.ps1 restart
@@ -366,19 +367,19 @@ docker-compose restart homeassistant
 
 ### 步骤 1：修改 configuration.yaml
 
-打开配置文件并**完全替换** `zha:` 部分：
+在现有 `zha:` 配置下补充 `zigpy_config.ota`：
 
 ```yaml
 zha:
   database_path: /config/zigbee.db
+  enable_quirks: true
+  custom_quirks_path: /config/zha_quirks
   zigpy_config:
     ota:
       extra_providers:
         - type: advanced
           warning: I understand I can *destroy* my devices by enabling OTA updates from files. Some OTA updates can be mistakenly applied to the wrong device, breaking it. I am consciously using this at my own risk.
           path: /config/zigpy_ota
-  enable_quirks: true
-  custom_quirks_path: /config/zha_quirks
 ```
 
 **⚠️ 警告声明说明：**
@@ -418,7 +419,7 @@ config/zigpy_ota/
 ### 步骤 3：重启 Home Assistant
 
 ```bash
-docker-compose restart homeassistant
+docker compose restart homeassistant
 ```
 
 ### 步骤 4：触发更新
@@ -449,8 +450,8 @@ docker-compose restart homeassistant
 zha:
   zigpy_config:
     ota:
-      # 禁用默认的 VENDOR_A 官方源（因为要用自己的固件）
-      disable_default_providers: [vendor_a]
+      # 禁用默认的目标厂商官方源（如果你要完全改用自己的固件）
+      disable_default_providers: [your_vendor]
       extra_providers:
         # 保留其他厂商的官方更新
         - type: ikea
@@ -522,6 +523,17 @@ logger:
 
 重启后，在 **设置 → 系统 → 日志** 中查看详细信息。
 
+如果你只想观察 OTA 流程，也可以把日志范围再收紧一些：
+
+```yaml
+logger:
+  default: info
+  logs:
+    zigpy.ota: debug
+    zigpy.ota.provider: debug
+    homeassistant.components.zha: debug
+```
+
 ---
 
 ## 故障排除
@@ -565,7 +577,7 @@ docker logs homeassistant 2>&1 | grep -i "ota"
 4. **重启 Home Assistant**
 
 ```bash
-docker-compose restart homeassistant
+docker compose restart homeassistant
 ```
 
 ### 问题 2：更新失败或卡住
@@ -676,7 +688,7 @@ python parse_ota.py your_firmware.ota
 | 配置文件 | `config/configuration.yaml` | ZHA 主配置 |
 | 固件目录 | `config/zigpy_ota/` | 放置 .ota 文件 |
 | 索引文件 | `config/zigpy_ota/index.json` | z2m_local 需要 |
-| 重启 HA | `docker-compose restart homeassistant` | 应用新配置 |
+| 重启 HA | `docker compose restart homeassistant` | 应用新配置 |
 | 查看日志 | `docker logs -f homeassistant` | 调试问题 |
 | 解析固件 | `python parse_ota.py xxx.ota` | 获取固件信息 |
 | 设备管理 | 设置 → 设备与服务 → ZHA | 触发更新 |
@@ -690,13 +702,13 @@ python parse_ota.py your_firmware.ota
 ```yaml
 zha:
   database_path: /config/zigbee.db
+  enable_quirks: true
+  custom_quirks_path: /config/zha_quirks
   zigpy_config:
     ota:
       extra_providers:
         - type: z2m_local
           index_file: /config/zigpy_ota/index.json
-  enable_quirks: true
-  custom_quirks_path: /config/zha_quirks
 ```
 
 ### advanced 完整配置
@@ -704,14 +716,14 @@ zha:
 ```yaml
 zha:
   database_path: /config/zigbee.db
+  enable_quirks: true
+  custom_quirks_path: /config/zha_quirks
   zigpy_config:
     ota:
       extra_providers:
         - type: advanced
           warning: I understand I can *destroy* my devices by enabling OTA updates from files. Some OTA updates can be mistakenly applied to the wrong device, breaking it. I am consciously using this at my own risk.
           path: /config/zigpy_ota
-  enable_quirks: true
-  custom_quirks_path: /config/zha_quirks
 ```
 
 ### index.json 模板
@@ -762,6 +774,7 @@ zha:
 5. **使用 Git 管理配置文件** - 方便回滚和追踪变更
 6. **开发阶段优先使用 advanced 模式** - 快速迭代测试
 7. **生产环境使用 z2m_local 模式** - 精确控制版本
+8. **平时保持最小 YAML** - 不需要本地 OTA 时移除或注释 `zigpy_config.ota`
 
 ### ❌ 避免做法
 
