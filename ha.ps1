@@ -46,8 +46,9 @@ function Restart-HA {
 }
 
 function Show-Logs {
+    $since = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
     Write-Host "==> 查看日志（Ctrl+C 退出）" -ForegroundColor Cyan
-    docker logs -f $ContainerName
+    docker logs --since $since -f $ContainerName
 }
 
 function Enter-Shell {
