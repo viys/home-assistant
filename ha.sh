@@ -15,6 +15,7 @@ show_help() {
     echo "  ./ha.sh stop       停止 Home Assistant"
     echo "  ./ha.sh restart    重启 Home Assistant"
     echo "  ./ha.sh logs       查看日志（实时）"
+    echo "  ./ha.sh logs-all   查看所有历史日志并持续跟随"
     echo "  ./ha.sh shell      进入容器命令行"
     echo "  ./ha.sh open       显示 Web 页面地址"
     echo "  ./ha.sh status     查看容器状态"
@@ -46,7 +47,13 @@ restart_ha() {
 show_logs() {
     go_project_dir
     echo "==> 查看日志（Ctrl+C 退出）"
-    docker compose logs -f
+    docker logs --since "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" -f homeassistant
+}
+
+show_all_logs() {
+    go_project_dir
+    echo "==> 查看所有日志（Ctrl+C 退出）"
+    docker logs -f homeassistant
 }
 
 enter_shell() {
@@ -68,12 +75,13 @@ show_status() {
 }
 
 case "$ACTION" in
-    start)   start_ha ;;
-    stop)    stop_ha ;;
-    restart) restart_ha ;;
-    logs)    show_logs ;;
-    shell)   enter_shell ;;
-    open)    open_web ;;
-    status)  show_status ;;
-    *)       show_help ;;
+    start)    start_ha ;;
+    stop)     stop_ha ;;
+    restart)  restart_ha ;;
+    logs)     show_logs ;;
+    logs-all) show_all_logs ;;
+    shell)    enter_shell ;;
+    open)     open_web ;;
+    status)   show_status ;;
+    *)        show_help ;;
 esac

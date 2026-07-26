@@ -184,6 +184,23 @@ zha:
 - **自定义 Quirks**：将设备适配文件放入 `config/zha_quirks/` 目录
 - **OTA 固件更新**：参考 [ZHA本地OTA固件更新教程](docs/ZHA本地OTA固件更新教程.md)
 
+### 本地调试 zha-device-handlers
+
+如果需要让 Home Assistant 容器直接加载本机克隆的 `zha-device-handlers` 代码，可在 `docker-compose.yml` 中增加 `PYTHONPATH` 和只读挂载：
+
+```yml
+services:
+  homeassistant:
+    environment:
+      - TZ=Asia/Shanghai
+      - PYTHONPATH=/opt/zha-device-handlers
+    volumes:
+      - ./config:/config
+      - /path/to/zha-device-handlers:/opt/zha-device-handlers:ro
+```
+
+其中左侧路径是宿主机上的 `zha-device-handlers` 仓库位置，右侧 `/opt/zha-device-handlers` 是容器内路径。`PYTHONPATH` 指向容器内路径后，Home Assistant 启动时会优先从这份本地代码加载 ZHA 相关模块，适合调试自定义设备适配或本地修改过的 handlers。
+
 ### ZHA 加载失败排查
 
 如果 Home Assistant 页面提示“集成未能加载，请尝试重启 Home Assistant。zha 加载失败”，优先检查 `config/zha_quirks/` 目录是否存在。

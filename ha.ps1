@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("start", "stop", "restart", "logs", "shell", "open", "status", "help")]
+    [ValidateSet("start", "stop", "restart", "logs", "logs-all", "shell", "open", "status", "help")]
     [string]$Action = "help"
 )
 
@@ -17,6 +17,7 @@ function Show-Help {
     Write-Host "  .\ha.ps1 stop       停止 Home Assistant"
     Write-Host "  .\ha.ps1 restart    重启 Home Assistant"
     Write-Host "  .\ha.ps1 logs       查看日志（实时）"
+    Write-Host "  .\ha.ps1 logs-all   查看所有历史日志并持续跟随"
     Write-Host "  .\ha.ps1 shell      进入容器命令行"
     Write-Host "  .\ha.ps1 open       打开 Web 页面"
     Write-Host "  .\ha.ps1 status     查看容器状态"
@@ -51,6 +52,11 @@ function Show-Logs {
     docker logs --since $since -f $ContainerName
 }
 
+function Show-AllLogs {
+    Write-Host "==> 查看所有日志（Ctrl+C 退出）" -ForegroundColor Cyan
+    docker logs -f $ContainerName
+}
+
 function Enter-Shell {
     Write-Host "==> 进入容器命令行" -ForegroundColor Cyan
     docker exec -it $ContainerName bash
@@ -66,13 +72,14 @@ function Show-Status {
 }
 
 switch ($Action) {
-    "start"   { Start-HA }
-    "stop"    { Stop-HA }
-    "restart" { Restart-HA }
-    "logs"    { Show-Logs }
-    "shell"   { Enter-Shell }
-    "open"    { Open-Web }
-    "status"  { Show-Status }
-    "help"    { Show-Help }
-    default   { Show-Help }
+    "start"    { Start-HA }
+    "stop"     { Stop-HA }
+    "restart"  { Restart-HA }
+    "logs"     { Show-Logs }
+    "logs-all" { Show-AllLogs }
+    "shell"    { Enter-Shell }
+    "open"     { Open-Web }
+    "status"   { Show-Status }
+    "help"     { Show-Help }
+    default    { Show-Help }
 }
