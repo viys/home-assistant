@@ -18,6 +18,9 @@ __pycache__/
 config/.storage/
 config/.cache/
 
+# HACS 及其下载的社区集成（运行时文件）
+config/custom_components/
+
 # Home Assistant 官方默认蓝图
 config/blueprints/*/homeassistant/
 

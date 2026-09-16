@@ -136,6 +136,7 @@ ls /dev/ttyUSB*
 | `restart` | 重启 Home Assistant |
 | `logs` | 查看实时日志 |
 | `shell` | 进入容器命令行 |
+| `install-hacs` | 安装 HACS |
 | `open` | 显示 Web 访问地址 |
 | `status` | 查看容器运行状态 |
 
