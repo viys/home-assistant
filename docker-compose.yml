@@ -10,4 +10,4 @@ services:
     volumes:
       - ./config:/config
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0  # 将设备映射到容器
+      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_bc5b8971be74ef11bffbd08c8fcc3fa0-if00-port0:/dev/ha-itead
