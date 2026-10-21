@@ -1,11 +1,12 @@
 blueprint:
-  name: Sync Remote Temperature Sources to TP-WGZBA (ZHA)
+  name: Sync Remote Temperature Sources to TP-WGZBA
   author: Sonoff
   description: 'Synchronizes one to three external temperature sources with a SONOFF
-    TP-WGZBA thermostat through ZHA. The TP-WGZBA also supports Zigbee2MQTT, but
-    this blueprint currently implements the ZHA path; Zigbee2MQTT support is under
-    development. Firmware 0x00001004 uses the existing single-source protocol;
-    firmware 0x00001006 and newer use three incremental remote-temperature slots.
+    TP-WGZBA thermostat through ZHA. The TP-WGZBA also supports Zigbee2MQTT, but this
+    blueprint currently implements the ZHA path; Zigbee2MQTT support is under development.
+    Firmware 0x00001004 uses the existing single-source protocol; firmware 0x00001006
+    and newer use three incremental remote-temperature slots. On older firmware, source
+    2 and source 3 are ignored and only source 1 is synchronized.
 
     '
   domain: automation
@@ -102,37 +103,26 @@ conditions:
     | float - 32) * 5 / 9\n                   if state_attr(source_entity_1, 'unit_of_measurement')
     == '°F'\n                   else states(source_entity_1) | float - 273.15\n                   if
     state_attr(source_entity_1, 'unit_of_measurement') == 'K'\n                   else
-    states(source_entity_1) | float) <= 327.67\n   and (source_entity_2 | trim ==
-    '' or\n        (source_entity_2 not in (device_entities(target_device) or [])\n
-    \        and is_number(states(source_entity_2))\n         and state_attr(source_entity_2,
-    'unit_of_measurement') in ['°C', '°F', 'K']\n         and -273.15 <= ((states(source_entity_2)
-    | float - 32) * 5 / 9\n                         if state_attr(source_entity_2,
-    'unit_of_measurement') == '°F'\n                         else states(source_entity_2)
-    | float - 273.15\n                         if state_attr(source_entity_2, 'unit_of_measurement')
-    == 'K'\n                         else states(source_entity_2) | float) <= 327.67))\n
-    \  and (source_entity_3 | trim == '' or\n        (source_entity_3 not in (device_entities(target_device)
-    or [])\n         and is_number(states(source_entity_3))\n         and state_attr(source_entity_3,
-    'unit_of_measurement') in ['°C', '°F', 'K']\n         and -273.15 <= ((states(source_entity_3)
-    | float - 32) * 5 / 9\n                         if state_attr(source_entity_3,
-    'unit_of_measurement') == '°F'\n                         else states(source_entity_3)
-    | float - 273.15\n                         if state_attr(source_entity_3, 'unit_of_measurement')
-    == 'K'\n                         else states(source_entity_3) | float) <= 327.67))
+    states(source_entity_1) | float) <= 327.67\n   and (not (supports_multi_remote_temperature
+    | bool)\n        or source_entity_2 | trim == ''\n        or (source_entity_2
+    not in (device_entities(target_device) or [])\n            and is_number(states(source_entity_2))\n
+    \           and state_attr(source_entity_2, 'unit_of_measurement') in ['°C', '°F',
+    'K']\n            and -273.15 <= ((states(source_entity_2) | float - 32) * 5 /
+    9\n                            if state_attr(source_entity_2, 'unit_of_measurement')
+    == '°F'\n                            else states(source_entity_2) | float - 273.15\n
+    \                           if state_attr(source_entity_2, 'unit_of_measurement')
+    == 'K'\n                            else states(source_entity_2) | float) <= 327.67))\n
+    \  and (not (supports_multi_remote_temperature | bool)\n        or source_entity_3
+    | trim == ''\n        or (source_entity_3 not in (device_entities(target_device)
+    or [])\n            and is_number(states(source_entity_3))\n            and state_attr(source_entity_3,
+    'unit_of_measurement') in ['°C', '°F', 'K']\n            and -273.15 <= ((states(source_entity_3)
+    | float - 32) * 5 / 9\n                            if state_attr(source_entity_3,
+    'unit_of_measurement') == '°F'\n                            else states(source_entity_3)
+    | float - 273.15\n                            if state_attr(source_entity_3, 'unit_of_measurement')
+    == 'K'\n                            else states(source_entity_3) | float) <= 327.67))
     }}\n"
 actions:
 - choose:
-  - conditions:
-    - condition: template
-      value_template: '{{ not (supports_multi_remote_temperature | bool) and (has_extra_sources
-        | bool) }}'
-    sequence:
-    - action: system_log.write
-      data:
-        level: error
-        message: 'TP-WGZBA {{ target_sw_version | trim or ''unknown'' }} only supports
-          one remote temperature source; remove source 2/3 or upgrade to 0x00001006.
-
-          '
-    - stop: The target firmware does not support multiple remote temperature sources.
   - conditions:
     - condition: template
       value_template: '{{ supports_multi_remote_temperature | bool }}'
@@ -194,15 +184,21 @@ actions:
     - condition: template
       value_template: '{{ not (supports_multi_remote_temperature | bool) }}'
     sequence:
-    - action: zha.set_zigbee_cluster_attribute
-      data:
-        ieee: '{{ target_ieee | trim }}'
-        endpoint_id: 1
-        cluster_id: 64529
-        cluster_type: in
-        attribute: 65297
-        value: "{% set value = states(source_entity_1) | float %} {% set unit = state_attr(source_entity_1,
-          'unit_of_measurement') %} {{ (((value - 32) * 5 / 9 if unit == '°F'\n     else
-          value - 273.15 if unit == 'K'\n     else value) * 100) | round(0) | int
-          }}\n"
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ full_sync | bool or trigger.event.data.entity_id ==
+            source_entity_1 }}'
+        sequence:
+        - action: zha.set_zigbee_cluster_attribute
+          data:
+            ieee: '{{ target_ieee | trim }}'
+            endpoint_id: 1
+            cluster_id: 64529
+            cluster_type: in
+            attribute: 65297
+            value: "{% set value = states(source_entity_1) | float %} {% set unit
+              = state_attr(source_entity_1, 'unit_of_measurement') %} {{ (((value
+              - 32) * 5 / 9 if unit == '°F'\n     else value - 273.15 if unit == 'K'\n
+              \    else value) * 100) | round(0) | int }}\n"
 mode: restart
