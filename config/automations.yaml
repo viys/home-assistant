@@ -1,14 +1,4 @@
-- id: '1792550216682'
-  alias: '111'
-  description: ''
-  use_blueprint:
-    path: viys/remote_temperature_sources_link_tp_wgzba.yaml
-    input:
-      target_device: f0ddaa09c2640a52e373f7bcf7fc3120
-      source_entity_1: sensor.ke_ting_sonoff_snzb_02wd_wen_du
-      source_entity_2: sensor.ke_ting_02d_54_wen_du
-      source_entity_3: sensor.sonoff_snzb_02d_wen_du
-- id: '1792552062570'
+- id: '1792552872057'
   alias: '112'
   description: ''
   use_blueprint:
